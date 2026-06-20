@@ -1,0 +1,32 @@
+[
+  {
+    "id": "cinematic_electronic",
+    "user_requirement": "Create a mysterious cinematic electronic opening for a short sci-fi film.",
+    "generator_backend": "mock",
+    "expected_fields": [
+      "music_spec",
+      "generation_prompt",
+      "audio_path",
+      "generation_result",
+      "audio_features",
+      "appreciation_result",
+      "revision_suggestion",
+      "history_id"
+    ]
+  },
+  {
+    "id": "calm_lofi",
+    "user_requirement": "Generate a calm lo-fi study loop with warm texture and gentle rhythm.",
+    "generator_backend": "mock",
+    "expected_fields": [
+      "music_spec",
+      "generation_prompt",
+      "audio_path",
+      "generation_result",
+      "audio_features",
+      "appreciation_result",
+      "revision_suggestion",
+      "history_id"
+    ]
+  }
+]

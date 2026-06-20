@@ -1,0 +1,9 @@
+# Optional dependencies for the MusicGen backend.
+# Install after base requirements only when you want real local MusicGen.
+# This project uses the Hugging Face Transformers implementation of MusicGen
+# because it is easier to install on macOS than the full AudioCraft stack.
+torch==2.1.0
+numpy>=1.26.0,<2.0.0
+transformers==4.35.2
+accelerate>=0.27.0
+safetensors>=0.4.0

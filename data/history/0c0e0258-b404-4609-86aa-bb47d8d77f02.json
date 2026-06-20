@@ -1,0 +1,72 @@
+{
+  "history_id": "0c0e0258-b404-4609-86aa-bb47d8d77f02",
+  "run_mode": "generation",
+  "generator_backend": "mock",
+  "user_requirement": "生成一段适合科幻短片开场的 cinematic electronic 音乐，氛围神秘但有推进感。",
+  "music_spec": {
+    "style": "cinematic",
+    "mood": "energetic",
+    "tempo_bpm": 156,
+    "key": "C major",
+    "duration_seconds": 12,
+    "structure": [
+      "short motif intro",
+      "tight main groove",
+      "rhythmic break",
+      "impact ending"
+    ],
+    "instruments": [
+      "punchy synth lead",
+      "short pluck arpeggio",
+      "tight bass",
+      "driving percussion"
+    ],
+    "reference_requirement": "生成一段适合科幻短片开场的 cinematic electronic 音乐，氛围神秘但有推进感。",
+    "latest_user_message": "生成一段适合科幻短片开场的 cinematic electronic 音乐，氛围神秘但有推进感。"
+  },
+  "generation_prompt": "Generate a 12 second cinematic piece in C major at 156 BPM. The mood should be energetic. Use punchy synth lead, short pluck arpeggio, tight bass, driving percussion. Follow this structure: short motif intro, tight main groove, rhythmic break, impact ending. Prioritize a memorable motif, clear section contrast, and clean production.",
+  "audio_path": "data/generated/0c0e0258-b404-4609-86aa-bb47d8d77f02.wav",
+  "generation_result": {
+    "requested_backend": "mock",
+    "used_backend": "mock",
+    "status": "success",
+    "error": null,
+    "fallback_used": false
+  },
+  "audio_features": {
+    "duration": 12.0,
+    "tempo": 103.359375,
+    "rms_energy": 0.229435,
+    "spectral_centroid_mean": 945.305039,
+    "zero_crossing_rate_mean": 0.032535,
+    "onset_strength_mean": 5.880325
+  },
+  "appreciation_result": {
+    "overall_score": 0.693,
+    "profile_scores": {
+      "tempo_bpm": 103.359,
+      "tempo_alignment": 0.6625576923076923,
+      "energy": 1.0,
+      "brightness": 0.18906100779999999,
+      "onset_activity": 1.0
+    },
+    "target_profile": {
+      "tempo_bpm": 156.0,
+      "energy": 0.78,
+      "brightness": 0.58,
+      "onset_activity": 0.72
+    },
+    "strengths": [],
+    "issues": [
+      "节奏偏慢：当前约 103.4 BPM，目标是 156 BPM，需要更清晰的鼓点推进。",
+      "能量偏满：当前 1.00，目标 0.78，需要留出段落对比。",
+      "明亮度不足：当前 0.19，目标 0.58，加入更清晰的主奏合成器、闪亮铺底或高频点缀。",
+      "瞬态过密：当前 1.00，目标 0.72，需要减少打击层让律动呼吸。"
+    ],
+    "alignment_note": "Target style is cinematic with a energetic mood. Latest user turn: 生成一段适合科幻短片开场的 cinematic electronic 音乐，氛围神秘但有推进感。",
+    "optimized_prompt_used": false,
+    "resolved_categories": []
+  },
+  "revision_suggestion": "下一轮围绕 影视配乐 / 紧凑有推进感 / 每分钟 156 拍 迭代：增强主奏高频与清透感。；加强鼓点推进，让目标速度更清晰。；控制能量层次。；减少打击瞬态密度。 用户最新意图：生成一段适合科幻短片开场的 cinematic electronic 音乐，氛围神秘但有推进感。",
+  "optimized_prompt": "生成约12秒影视配乐：C大调，156 BPM，情绪紧凑有推进感。结构：短前奏动机、紧凑主体律动、节奏断点。音色：有冲击力的合成器主奏、短促拨奏琶音、紧实低音、推进型鼓组。重点：增强主奏高频与清透感、加强鼓点推进，让目标速度更清晰、控制能量层次。"
+}

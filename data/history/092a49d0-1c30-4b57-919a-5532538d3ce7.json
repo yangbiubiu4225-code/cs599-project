@@ -1,0 +1,61 @@
+{
+  "history_id": "092a49d0-1c30-4b57-919a-5532538d3ce7",
+  "run_mode": "generation",
+  "generator_backend": "mock",
+  "user_requirement": "生成一段适合科幻短片开场的 cinematic electronic 音乐，氛围神秘但有推进感。",
+  "music_spec": {
+    "style": "cinematic",
+    "mood": "focused",
+    "tempo_bpm": 96,
+    "key": "C major",
+    "duration_seconds": 12,
+    "structure": [
+      "intro motif",
+      "main groove",
+      "variation",
+      "short ending"
+    ],
+    "instruments": [
+      "synth lead",
+      "warm pad",
+      "bass",
+      "light percussion"
+    ],
+    "reference_requirement": "生成一段适合科幻短片开场的 cinematic electronic 音乐，氛围神秘但有推进感。"
+  },
+  "generation_prompt": "Generate a 12 second cinematic piece in C major at 96 BPM. The mood should be focused. Use synth lead, warm pad, bass, light percussion. Follow this structure: intro motif, main groove, variation, short ending. Prioritize a memorable motif, clear section contrast, and clean production.",
+  "audio_path": "data/generated/092a49d0-1c30-4b57-919a-5532538d3ce7.wav",
+  "generation_result": {
+    "requested_backend": "mock",
+    "used_backend": "mock",
+    "status": "success",
+    "error": null,
+    "fallback_used": false
+  },
+  "audio_features": {
+    "duration": 12.0,
+    "tempo": 95.703125,
+    "rms_energy": 0.255999,
+    "spectral_centroid_mean": 491.021981,
+    "zero_crossing_rate_mean": 0.029643,
+    "onset_strength_mean": 2.499663
+  },
+  "appreciation_result": {
+    "overall_score": 0.867,
+    "profile_scores": {
+      "tempo_stability": 1.0,
+      "energy": 1.0,
+      "brightness": 0.0982043962
+    },
+    "strengths": [
+      "The tempo sits in a usable musical range.",
+      "The brightness is controlled and should mix easily."
+    ],
+    "issues": [
+      "add quieter contrast so high-energy sections feel intentional"
+    ],
+    "alignment_note": "Target style is cinematic with a focused mood."
+  },
+  "revision_suggestion": "Revise the next draft by addressing: add quieter contrast so high-energy sections feel intentional",
+  "optimized_prompt": "Generate a 12 second cinematic piece in C major at 96 BPM. The mood should be focused. Use synth lead, warm pad, bass, light percussion. Follow this structure: intro motif, main groove, variation, short ending. Prioritize a memorable motif, clear section contrast, and clean production. Revision focus: Revise the next draft by addressing: add quieter contrast so high-energy sections feel intentional"
+}
