@@ -345,6 +345,22 @@ def _render_rag_panel(state: MusicAgentState) -> None:
     sources = state.get("rag_sources", [])
     matches = state.get("rag_matches", [])
     context = state.get("retrieved_context", "")
+    summary = state.get("rag_summary", "")
+    query = state.get("rag_query", "")
+    profile = state.get("rag_intent_profile", {})
+
+    if query:
+        st.markdown("**检索 Query**")
+        st.code(query, language="text")
+
+    if summary:
+        st.markdown("**检索摘要**")
+        st.success(summary)
+
+    if profile:
+        st.markdown("**识别到的音乐意图**")
+        for concept, hits in profile.items():
+            st.write(f"- `{concept}`：{', '.join(hits[:8])}")
 
     if not sources:
         st.info("本轮没有检索到明显相关的音乐知识。")
@@ -358,6 +374,15 @@ def _render_rag_panel(state: MusicAgentState) -> None:
     for item in matches:
         with st.expander(f"{item.get('title', '知识片段')} · score {item.get('score', 0)}"):
             st.caption(item.get("source", "unknown"))
+            st.write(f"命中原因：{item.get('reason', '无')}")
+            matched_terms = item.get("matched_terms", [])
+            matched_keywords = item.get("matched_keywords", [])
+            if matched_terms:
+                st.write("匹配词：`" + "`, `".join(matched_terms[:12]) + "`")
+            if matched_keywords:
+                st.write("精确关键词：`" + "`, `".join(matched_keywords[:8]) + "`")
+            if item.get("fallback"):
+                st.warning("这是兜底知识片段，用于保证 Agent 至少有基础音乐知识可参考。")
             st.write(item.get("text", ""))
 
     with st.expander("完整 RAG 上下文"):

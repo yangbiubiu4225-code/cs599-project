@@ -14,6 +14,7 @@ __pycache__/
 .streamlit_home/
 .streamlit/secrets.toml
 tmp/
+work/
 data/raw/
 data/processed/
 data/generated/*

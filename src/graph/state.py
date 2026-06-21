@@ -10,6 +10,9 @@ class MusicAgentState(TypedDict, total=False):
     generator_backend: str
     user_requirement: str
     latest_user_message: str
+    rag_query: str
+    rag_summary: str
+    rag_intent_profile: dict[str, list[str]]
     retrieved_context: str
     rag_sources: list[str]
     rag_matches: list[dict[str, Any]]

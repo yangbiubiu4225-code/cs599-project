@@ -10,6 +10,8 @@ STYLE_KEYWORDS = {
     "classical": ["classical", "orchestral", "piano", "strings", "古典", "管弦", "钢琴", "弦乐"],
     "pop": ["pop", "catchy", "hook", "radio", "流行", "抓耳", "主旋律"],
     "lofi": ["lofi", "lo-fi", "chill", "study", "低保真", "学习", "放松"],
+    "rock": ["rock", "band", "guitar", "drums", "摇滚", "乐队", "吉他"],
+    "guofeng": ["guofeng", "chinese", "traditional", "国风", "古风", "中国风", "古筝", "笛子"],
 }
 
 MOOD_KEYWORDS = {
@@ -54,6 +56,10 @@ def _has_any(text: str, keywords: list[str]) -> bool:
 
 def _rag_has(context: str, keywords: list[str]) -> bool:
     return _has_any(context, keywords)
+
+
+def _profile_has(state: MusicAgentState, concept: str) -> bool:
+    return concept in state.get("rag_intent_profile", {})
 
 
 def _base_tempo(style: str, mood: str) -> int:
@@ -104,17 +110,25 @@ def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
     style = _match_keyword(intent_text, STYLE_KEYWORDS, "cinematic electronic")
     mood = _match_keyword(intent_text, MOOD_KEYWORDS, "focused")
 
-    if _rag_has(rag_context, ["cyberpunk", "赛博朋克", "neon", "霓虹"]):
+    if _profile_has(state, "cyberpunk") or _rag_has(rag_context, ["cyberpunk", "赛博朋克", "neon", "霓虹"]):
         style = "cinematic electronic"
         if mood == "focused":
             mood = "mysterious"
-    elif _rag_has(rag_context, ["lo-fi", "lofi", "低保真"]):
+    elif _profile_has(state, "lofi") or _rag_has(rag_context, ["lo-fi", "lofi", "低保真"]):
         style = "lofi"
         if mood == "focused":
             mood = "calm"
-    elif _rag_has(rag_context, ["ambient", "冥想", "氛围"]):
+    elif _profile_has(state, "ambient") or _rag_has(rag_context, ["ambient", "冥想", "氛围"]):
         if mood == "focused":
             mood = "calm"
+    elif _profile_has(state, "rock"):
+        style = "rock"
+        if mood == "focused":
+            mood = "energetic"
+    elif _profile_has(state, "guofeng"):
+        style = "guofeng"
+        if mood == "focused":
+            mood = "mysterious"
 
     # In multi-turn mode, the latest user message should have more weight than old context.
     if _has_any(latest, BRIGHT_WORDS):
@@ -134,6 +148,16 @@ def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
             mood = "focused"
 
     tempo_bpm = _base_tempo(style, mood)
+    if _profile_has(state, "cyberpunk"):
+        tempo_bpm = 128 if mood != "calm" else 100
+    if _profile_has(state, "edm"):
+        tempo_bpm = max(tempo_bpm, 128)
+    if _profile_has(state, "rock"):
+        tempo_bpm = max(tempo_bpm, 132)
+    if _profile_has(state, "guofeng"):
+        tempo_bpm = 92 if mood != "energetic" else 112
+    if _profile_has(state, "sad_piano"):
+        tempo_bpm = 72
     if _has_any(latest, TIGHT_WORDS):
         tempo_bpm = min(160, tempo_bpm + 16)
     if _has_any(latest, CALM_WORDS):
@@ -149,15 +173,21 @@ def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
 
     instruments = ["synth lead", "warm pad", "bass", "light percussion"]
     structure = ["intro motif", "main groove", "variation", "short ending"]
-    if _rag_has(rag_context, ["cyberpunk", "赛博朋克", "neon", "industrial"]):
+    if _profile_has(state, "cyberpunk") or _rag_has(rag_context, ["cyberpunk", "赛博朋克", "neon", "industrial"]):
         instruments = ["dark synth lead", "sub bass", "industrial percussion", "ambient pad"]
         structure = ["neon atmosphere intro", "bass pulse groove", "contrast tension", "resolved ending"]
-    elif _rag_has(rag_context, ["lo-fi", "lofi", "低保真"]):
+    elif _profile_has(state, "lofi") or _rag_has(rag_context, ["lo-fi", "lofi", "低保真"]):
         instruments = ["warm keys", "vinyl texture", "mellow bass", "soft drums"]
         structure = ["soft loop intro", "stable groove", "gentle variation", "loopable ending"]
-    elif _rag_has(rag_context, ["ambient", "冥想", "氛围"]):
+    elif _profile_has(state, "ambient") or _rag_has(rag_context, ["ambient", "冥想", "氛围"]):
         instruments = ["slow pad", "soft drone", "gentle low bass", "long reverb texture"]
         structure = ["texture fade in", "slow evolution", "wide space", "soft fade out"]
+    elif _profile_has(state, "rock"):
+        instruments = ["electric guitar riff", "bass guitar", "drum kit", "power chord layer"]
+        structure = ["riff intro", "main band groove", "breakdown", "impact ending"]
+    elif _profile_has(state, "guofeng"):
+        instruments = ["guzheng pluck", "dizi lead", "soft strings", "deep drum"]
+        structure = ["oriental motif intro", "melodic statement", "cinematic lift", "resolved ending"]
     if _has_any(latest, BRIGHT_WORDS):
         instruments = ["bright synth lead", "shimmer pad", "sub bass", "crisp percussion"]
         structure = ["clear motif intro", "brighter groove", "lifted variation", "resolved ending"]
@@ -177,8 +207,10 @@ def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
                 instruments[-1:] = ["light percussion"]
 
     key = "A minor" if mood in {"dark", "mysterious"} else "C major"
-    if _rag_has(rag_context, ["cyberpunk", "赛博朋克"]):
+    if _profile_has(state, "cyberpunk") or _rag_has(rag_context, ["cyberpunk", "赛博朋克"]):
         key = "A minor"
+    elif _profile_has(state, "guofeng"):
+        key = "D minor"
     if _has_any(latest, BRIGHT_WORDS):
         key = "D major"
     elif _has_any(latest, DARK_WORDS):
