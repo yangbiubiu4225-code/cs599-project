@@ -5,6 +5,8 @@
     "generator_backend": "mock",
     "expected_fields": [
       "music_spec",
+      "retrieved_context",
+      "rag_sources",
       "generation_prompt",
       "audio_path",
       "generation_result",
@@ -20,6 +22,8 @@
     "generator_backend": "mock",
     "expected_fields": [
       "music_spec",
+      "retrieved_context",
+      "rag_sources",
       "generation_prompt",
       "audio_path",
       "generation_result",

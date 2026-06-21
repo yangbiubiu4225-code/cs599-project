@@ -13,6 +13,9 @@ from src.graph.state import MusicAgentState
 from src.tools.audio_analyzer import analyze_audio as analyze_audio_tool
 from src.tools.memory_store import save_history as save_history_tool
 from src.tools.music_generator import generate_music as generate_music_tool
+from src.tools.rag_retriever import (
+    retrieve_music_context_for_state as retrieve_music_context_tool,
+)
 
 
 def _initial_state(
@@ -27,6 +30,9 @@ def _initial_state(
         "generator_backend": generator_backend,
         "user_requirement": user_requirement,
         "latest_user_message": latest_user_message or user_requirement,
+        "retrieved_context": "",
+        "rag_sources": [],
+        "rag_matches": [],
         "music_spec": {},
         "generation_prompt": "",
         "audio_path": audio_path,
@@ -41,6 +47,10 @@ def _initial_state(
 
 def understand_requirement(state: MusicAgentState) -> MusicAgentState:
     return understand_requirement_agent(state)
+
+
+def retrieve_music_context(state: MusicAgentState) -> MusicAgentState:
+    return retrieve_music_context_tool(state)
 
 
 def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
@@ -88,6 +98,7 @@ def build_generation_graph():
     graph = StateGraph(MusicAgentState)
 
     graph.add_node("understand_requirement", understand_requirement)
+    graph.add_node("retrieve_music_context", retrieve_music_context)
     graph.add_node("generate_music_spec", generate_music_spec)
     graph.add_node("generate_prompt", generate_prompt)
     graph.add_node("generate_music", generate_music)
@@ -97,7 +108,8 @@ def build_generation_graph():
     graph.add_node("save_history", save_history)
 
     graph.set_entry_point("understand_requirement")
-    graph.add_edge("understand_requirement", "generate_music_spec")
+    graph.add_edge("understand_requirement", "retrieve_music_context")
+    graph.add_edge("retrieve_music_context", "generate_music_spec")
     graph.add_edge("generate_music_spec", "generate_prompt")
     graph.add_edge("generate_prompt", "generate_music")
     graph.add_edge("generate_music", "analyze_audio")
@@ -113,13 +125,15 @@ def build_appreciation_graph():
     graph = StateGraph(MusicAgentState)
 
     graph.add_node("understand_requirement", understand_requirement)
+    graph.add_node("retrieve_music_context", retrieve_music_context)
     graph.add_node("generate_music_spec", generate_music_spec)
     graph.add_node("analyze_audio", analyze_audio)
     graph.add_node("appreciate_music", appreciate_music)
     graph.add_node("save_history", save_history)
 
     graph.set_entry_point("understand_requirement")
-    graph.add_edge("understand_requirement", "generate_music_spec")
+    graph.add_edge("understand_requirement", "retrieve_music_context")
+    graph.add_edge("retrieve_music_context", "generate_music_spec")
     graph.add_edge("generate_music_spec", "analyze_audio")
     graph.add_edge("analyze_audio", "appreciate_music")
     graph.add_edge("appreciate_music", "save_history")

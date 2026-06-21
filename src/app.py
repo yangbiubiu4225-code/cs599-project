@@ -23,6 +23,7 @@ EXAMPLE_PROMPTS = [
 WORKFLOW_LABELS = {
     "generation": [
         "需求理解",
+        "RAG 检索",
         "Music Spec",
         "Prompt 生成",
         "音乐生成",
@@ -33,6 +34,7 @@ WORKFLOW_LABELS = {
     ],
     "appreciation": [
         "需求理解",
+        "RAG 检索",
         "Music Spec",
         "音频分析",
         "鉴赏评价",
@@ -171,6 +173,8 @@ def _format_agent_reply(state: MusicAgentState) -> str:
     issues = appreciation.get("issues", [])
     strengths = appreciation.get("strengths", [])
     revision = state.get("revision_suggestion", "暂无修改建议。")
+    rag_sources = state.get("rag_sources", [])
+    source_text = "；".join(rag_sources[:2]) if rag_sources else "未检索到额外知识"
 
     if state.get("run_mode") == "appreciation":
         return _format_appreciation_reply(state)
@@ -189,6 +193,8 @@ def _format_agent_reply(state: MusicAgentState) -> str:
 
 **需要优化**：{issue_text}
 
+**RAG 参考**：{source_text}
+
 **下一轮建议**：{revision}
 """.strip()
 
@@ -200,6 +206,8 @@ def _format_appreciation_reply(state: MusicAgentState) -> str:
     scores = appreciation.get("profile_scores", {})
     detailed_review = appreciation.get("detailed_review", {})
     score = appreciation.get("overall_score", "暂无")
+    rag_sources = state.get("rag_sources", [])
+    source_text = "；".join(rag_sources[:2]) if rag_sources else "未检索到额外知识"
 
     duration = features.get("duration", "未知")
     tempo = features.get("tempo", "未知")
@@ -219,6 +227,8 @@ def _format_appreciation_reply(state: MusicAgentState) -> str:
 **鉴赏分数**：{score}
 
 **基础听感**：音频约 {duration} 秒，检测节奏约 {tempo} BPM；整体能量画像为 {energy}，明亮度画像为 {brightness}。
+
+**RAG 参考**：{source_text}
 
 {review_text}
 """.strip()
@@ -252,6 +262,8 @@ def _render_memory(state: MusicAgentState | None) -> None:
 
     st.write(f"History ID: `{state.get('history_id', '暂无')}`")
     st.write(f"Run Mode: `{state.get('run_mode', 'unknown')}`")
+    sources = state.get("rag_sources", [])
+    st.write(f"RAG Sources: `{len(sources)}`")
     backend = state.get("generation_result", {}).get(
         "used_backend",
         state.get("generator_backend", "N/A"),
@@ -285,7 +297,7 @@ def _render_result_panel(state: MusicAgentState | None) -> None:
             st.metric("生成后端", backend)
 
     if run_mode == "appreciation":
-        tabs = st.tabs(["音频", "Music Spec", "音频特征", "赏析"])
+        tabs = st.tabs(["音频", "Music Spec", "RAG", "音频特征", "赏析"])
 
         with tabs[0]:
             _play_audio(state.get("audio_path"))
@@ -294,13 +306,16 @@ def _render_result_panel(state: MusicAgentState | None) -> None:
             st.json(state.get("music_spec", {}))
 
         with tabs[2]:
-            st.json(state.get("audio_features", {}))
+            _render_rag_panel(state)
 
         with tabs[3]:
+            st.json(state.get("audio_features", {}))
+
+        with tabs[4]:
             _render_appreciation_panel(state)
         return
 
-    tabs = st.tabs(["音频", "Music Spec", "Prompt", "音频特征", "鉴赏", "修改建议"])
+    tabs = st.tabs(["音频", "Music Spec", "RAG", "Prompt", "音频特征", "鉴赏", "修改建议"])
 
     with tabs[0]:
         _play_audio(state.get("audio_path"))
@@ -309,18 +324,44 @@ def _render_result_panel(state: MusicAgentState | None) -> None:
         st.json(state.get("music_spec", {}))
 
     with tabs[2]:
+        _render_rag_panel(state)
+
+    with tabs[3]:
         st.code(state.get("generation_prompt") or "暂无 Prompt", language="text")
         with st.expander("优化后的 Prompt"):
             st.write(state.get("optimized_prompt") or "暂无")
 
-    with tabs[3]:
+    with tabs[4]:
         st.json(state.get("audio_features", {}))
 
-    with tabs[4]:
+    with tabs[5]:
         _render_generation_appreciation_panel(state)
 
-    with tabs[5]:
+    with tabs[6]:
         st.write(state.get("revision_suggestion") or "暂无修改建议。")
+
+
+def _render_rag_panel(state: MusicAgentState) -> None:
+    sources = state.get("rag_sources", [])
+    matches = state.get("rag_matches", [])
+    context = state.get("retrieved_context", "")
+
+    if not sources:
+        st.info("本轮没有检索到明显相关的音乐知识。")
+        return
+
+    st.markdown("**检索来源**")
+    for source in sources:
+        st.write(f"- `{source}`")
+
+    st.markdown("**检索片段**")
+    for item in matches:
+        with st.expander(f"{item.get('title', '知识片段')} · score {item.get('score', 0)}"):
+            st.caption(item.get("source", "unknown"))
+            st.write(item.get("text", ""))
+
+    with st.expander("完整 RAG 上下文"):
+        st.code(context, language="markdown")
 
 
 def _render_appreciation_panel(state: MusicAgentState) -> None:

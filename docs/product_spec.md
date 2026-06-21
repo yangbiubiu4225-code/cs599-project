@@ -2,7 +2,7 @@
 
 ## Goal
 
-MusicAgent Studio is a course demo for an AI music generation and appreciation agent. It supports two operating modes: AI music generation and AI music appreciation. It turns a user requirement into a structured music specification, a generation prompt, audio features, appreciation results, and revision suggestions.
+MusicAgent Studio is a course demo for an AI music generation and appreciation agent. It supports two operating modes: AI music generation and AI music appreciation. It turns a user requirement into a structured music specification, a generation prompt, audio features, appreciation results, and revision suggestions. It also uses a local Markdown music knowledge base as lightweight Agentic RAG context for style guidance, scoring criteria, and prompt examples.
 
 ## Target Users
 
@@ -14,7 +14,7 @@ MusicAgent Studio is a course demo for an AI music generation and appreciation a
 
 ### AI Music Generation Mode
 
-The user enters a music requirement. The system generates a Music Spec, builds a generation prompt, creates audio, analyzes the audio, appreciates the result, generates revision suggestions, and saves history.
+The user enters a music requirement. The system retrieves relevant music knowledge, generates a Music Spec, builds a generation prompt, creates audio, analyzes the audio, appreciates the result, generates revision suggestions, and saves history.
 
 The music generation backend can be either:
 
@@ -23,13 +23,14 @@ The music generation backend can be either:
 
 ### AI Music Appreciation Mode
 
-The user enters a target music requirement and uploads an audio file. The system skips the music generation node, analyzes the uploaded audio, evaluates it against the inferred Music Spec, generates suggestions, and saves history.
+The user enters a target music requirement and uploads an audio file. The system skips the music generation node, retrieves relevant appreciation guidelines, analyzes the uploaded audio, evaluates it against the inferred Music Spec, and saves history.
 
 ## Shared Modules
 
 Both modes reuse:
 
 - Audio Analyzer Tool
+- RAG Retriever Tool
 - Appreciation Agent
 - Revision Agent
 - Memory Store Tool

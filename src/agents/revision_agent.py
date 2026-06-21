@@ -34,6 +34,17 @@ INSTRUMENT_ZH = {
     "tight bass": "紧实低音",
     "driving percussion": "推进型鼓组",
     "lead hook layer": "主旋律叠加层",
+    "dark synth lead": "暗色合成器主奏",
+    "industrial percussion": "工业打击乐",
+    "ambient pad": "空间氛围铺底",
+    "warm keys": "温暖键盘",
+    "vinyl texture": "低保真颗粒质感",
+    "mellow bass": "柔和低音",
+    "soft drums": "轻柔鼓组",
+    "slow pad": "缓慢铺底",
+    "soft drone": "柔和持续音",
+    "gentle low bass": "轻柔低频",
+    "long reverb texture": "长混响质感",
 }
 
 STRUCTURE_ZH = {
@@ -53,6 +64,17 @@ STRUCTURE_ZH = {
     "hook repeat": "主题重复",
     "contrast variation": "对比变化段",
     "hook ending": "主题收束",
+    "neon atmosphere intro": "霓虹氛围引入",
+    "bass pulse groove": "低频脉冲律动",
+    "contrast tension": "张力对比段",
+    "soft loop intro": "柔和循环引入",
+    "stable groove": "稳定律动",
+    "gentle variation": "轻柔变化段",
+    "loopable ending": "可循环收束",
+    "texture fade in": "质感淡入",
+    "slow evolution": "缓慢演进",
+    "wide space": "宽阔空间段",
+    "soft fade out": "柔和淡出",
 }
 
 
@@ -68,6 +90,20 @@ def _intent_directives(latest: str) -> list[str]:
         directives.append("使用更暗的和声、低音区铺底，并减少高频闪光感")
     if "舒缓" in latest or "柔和" in latest or "慢一点" in latest:
         directives.append("降低节奏密度，使用更柔和的起音")
+    return directives
+
+
+def _rag_directives(context: str) -> list[str]:
+    directives: list[str] = []
+    lowered = context.lower()
+    if "cyberpunk" in lowered or "赛博朋克" in context:
+        directives.append("保留暗色合成器、低频脉冲和空间混响")
+    if "lo-fi" in lowered or "lofi" in lowered or "低保真" in context:
+        directives.append("保持温暖颗粒感和稳定低疲劳律动")
+    if "ambient" in lowered or "冥想" in context or "氛围" in context:
+        directives.append("减少瞬态密度，突出空间延展")
+    if "hook" in lowered or "主旋律" in context:
+        directives.append("让两小节主题保持前景可记忆")
     return directives
 
 
@@ -163,12 +199,13 @@ def generate_revision(state: MusicAgentState) -> MusicAgentState:
     appreciation = state.get("appreciation_result", {})
     spec = state.get("music_spec", {})
     latest = state.get("latest_user_message", "")
+    rag_context = state.get("retrieved_context", "")
     issues = appreciation.get("issues", [])
     resolved_categories = set(appreciation.get("resolved_categories", []))
     optimized_prompt_used = bool(appreciation.get("optimized_prompt_used"))
     instruments = _translate_list(spec.get("instruments", []), INSTRUMENT_ZH)
     structure = _translate_list(spec.get("structure", []), STRUCTURE_ZH)
-    directives = _dedupe(_intent_directives(latest))
+    directives = _dedupe(_intent_directives(latest) + _rag_directives(rag_context))
     issue_focus = _focus_items(
         latest,
         issues,

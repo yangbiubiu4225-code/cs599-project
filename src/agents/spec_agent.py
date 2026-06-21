@@ -52,6 +52,10 @@ def _has_any(text: str, keywords: list[str]) -> bool:
     return any(keyword.lower() in lowered for keyword in keywords)
 
 
+def _rag_has(context: str, keywords: list[str]) -> bool:
+    return _has_any(context, keywords)
+
+
 def _base_tempo(style: str, mood: str) -> int:
     tempo_bpm = 128 if style in {"electronic", "pop"} else 96
     if mood == "calm":
@@ -94,10 +98,23 @@ def _parse_key(text: str) -> str | None:
 def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
     requirement = state.get("user_requirement", "")
     latest = state.get("latest_user_message", "")
-    intent_text = f"{requirement}\n{latest}"
+    rag_context = state.get("retrieved_context", "")
+    intent_text = f"{requirement}\n{latest}\n{rag_context}"
 
     style = _match_keyword(intent_text, STYLE_KEYWORDS, "cinematic electronic")
     mood = _match_keyword(intent_text, MOOD_KEYWORDS, "focused")
+
+    if _rag_has(rag_context, ["cyberpunk", "赛博朋克", "neon", "霓虹"]):
+        style = "cinematic electronic"
+        if mood == "focused":
+            mood = "mysterious"
+    elif _rag_has(rag_context, ["lo-fi", "lofi", "低保真"]):
+        style = "lofi"
+        if mood == "focused":
+            mood = "calm"
+    elif _rag_has(rag_context, ["ambient", "冥想", "氛围"]):
+        if mood == "focused":
+            mood = "calm"
 
     # In multi-turn mode, the latest user message should have more weight than old context.
     if _has_any(latest, BRIGHT_WORDS):
@@ -132,6 +149,15 @@ def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
 
     instruments = ["synth lead", "warm pad", "bass", "light percussion"]
     structure = ["intro motif", "main groove", "variation", "short ending"]
+    if _rag_has(rag_context, ["cyberpunk", "赛博朋克", "neon", "industrial"]):
+        instruments = ["dark synth lead", "sub bass", "industrial percussion", "ambient pad"]
+        structure = ["neon atmosphere intro", "bass pulse groove", "contrast tension", "resolved ending"]
+    elif _rag_has(rag_context, ["lo-fi", "lofi", "低保真"]):
+        instruments = ["warm keys", "vinyl texture", "mellow bass", "soft drums"]
+        structure = ["soft loop intro", "stable groove", "gentle variation", "loopable ending"]
+    elif _rag_has(rag_context, ["ambient", "冥想", "氛围"]):
+        instruments = ["slow pad", "soft drone", "gentle low bass", "long reverb texture"]
+        structure = ["texture fade in", "slow evolution", "wide space", "soft fade out"]
     if _has_any(latest, BRIGHT_WORDS):
         instruments = ["bright synth lead", "shimmer pad", "sub bass", "crisp percussion"]
         structure = ["clear motif intro", "brighter groove", "lifted variation", "resolved ending"]
@@ -151,6 +177,8 @@ def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
                 instruments[-1:] = ["light percussion"]
 
     key = "A minor" if mood in {"dark", "mysterious"} else "C major"
+    if _rag_has(rag_context, ["cyberpunk", "赛博朋克"]):
+        key = "A minor"
     if _has_any(latest, BRIGHT_WORDS):
         key = "D major"
     elif _has_any(latest, DARK_WORDS):
@@ -171,6 +199,7 @@ def generate_music_spec(state: MusicAgentState) -> MusicAgentState:
         "duration_seconds": duration_seconds,
         "structure": structure,
         "instruments": instruments,
+        "rag_sources": state.get("rag_sources", []),
         "reference_requirement": requirement,
         "latest_user_message": latest,
     }

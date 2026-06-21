@@ -111,6 +111,8 @@ def _build_detailed_review(
     spec = state.get("music_spec", {})
     features = state.get("audio_features", {})
     latest = state.get("latest_user_message", "")
+    rag_sources = state.get("rag_sources", [])
+    rag_context = state.get("retrieved_context", "")
     tempo = float(scores.get("tempo_bpm", features.get("tempo", 120.0)))
     energy = float(scores.get("energy", 0.5))
     brightness = float(scores.get("brightness", 0.5))
@@ -167,13 +169,24 @@ def _build_detailed_review(
     if observations:
         scene += f" 从鉴赏角度看，最值得注意的是：{'；'.join(observations[:3])}。"
 
-    return {
+    rag_note = ""
+    if rag_context:
+        source_text = "、".join(rag_sources[:2]) if rag_sources else "本地音乐知识库"
+        rag_note = (
+            f"本轮赏析参考了 {source_text}。这些知识提示我关注风格惯用的音色、"
+            "节奏密度、空间感和主旋律位置，因此评价不只看分数，也会看它是否服务目标场景。"
+        )
+
+    review = {
         "整体印象": overall,
         "节奏与律动": rhythm,
         "音色与空间": timbre,
         "情绪表达": emotion,
         "适用场景": scene,
     }
+    if rag_note:
+        review["RAG 参考"] = rag_note
+    return review
 
 
 def _score_audio_profile(features: dict) -> dict[str, float]:
@@ -333,6 +346,8 @@ def appreciate_music(state: MusicAgentState) -> MusicAgentState:
         f"{spec.get('mood', 'unspecified')} mood. Latest user turn: "
         f"{latest or 'initial request'}"
     )
+    if state.get("rag_sources"):
+        alignment_note += f" Retrieved references: {', '.join(state.get('rag_sources', []))}."
     energy_fit = 1.0 - abs(scores["energy"] - target["energy"])
     brightness_fit = 1.0 - abs(scores["brightness"] - target["brightness"])
     onset_fit = 1.0 - abs(scores["onset_activity"] - target["onset_activity"])

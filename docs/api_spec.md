@@ -14,6 +14,7 @@ run_generation_workflow(
 ```
 
 Runs the full AI music generation workflow and returns the final state.
+The workflow includes a RAG retrieval node before Music Spec generation.
 
 ## `run_appreciation_workflow`
 
@@ -27,6 +28,35 @@ run_appreciation_workflow(
 ```
 
 Runs the AI music appreciation workflow. This skips the music generation node and analyzes the provided audio path.
+The workflow still retrieves relevant style and appreciation knowledge before analysis.
+
+## `retrieve_music_context`
+
+Location: `src/tools/rag_retriever.py`
+
+```python
+retrieve_music_context(
+    query: str,
+    top_k: int = 3,
+) -> dict
+```
+
+Retrieves relevant Markdown chunks from `src/knowledge/` and returns:
+
+```json
+{
+  "retrieved_context": "matched knowledge text",
+  "rag_sources": ["src/knowledge/music_styles.md#Cyberpunk / Sci-Fi Electronic"],
+  "rag_matches": [
+    {
+      "source": "src/knowledge/music_styles.md",
+      "title": "Cyberpunk / Sci-Fi Electronic",
+      "score": 4.5,
+      "text": "..."
+    }
+  ]
+}
+```
 
 ## `generate_music`
 
