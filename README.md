@@ -93,22 +93,24 @@ src/
 该模式跳过音乐生成与修改建议节点，直接分析用户上传音频，并从整体印象、节奏与律动、音色与空间、情绪表达、适用场景等角度给出赏析。两个模式共享音频分析工具、音乐鉴赏 Agent 和记忆存储工具。
 
 ## 安装与运行
-
+1.创建conda环境
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+conda create -n musicagent python=3.10 -y
+conda activate musicagent
+```
+2.安装基础依赖
+```bash
 pip install -r requirements.txt
+```
+3.配置环境变量
+```bash
 cp .env.example .env
+```
+4.启动项目
+```bash
 streamlit run src/app.py
 ```
-
-如果要启用 MusicGen 后端，再安装可选依赖：
-
-```bash
-pip install -r requirements-musicgen.txt
-```
-
-MusicGen 第一次运行会下载模型权重，配置会优先选择 `facebook/musicgen-small`。演示时建议把`MUSICGEN_DURATION` 设置为 5 到 8 秒。模型缓存默认放在 `data/model_cache/`
+默认使用 Mock 音乐生成，不需要额外模型M；usicGen 第一次运行会下载模型权重，配置会优先选择 `facebook/musicgen-small`。演示时建议把`MUSICGEN_DURATION` 设置为 5 到 8 秒。模型缓存默认放在 `data/model_cache/`
 ## 项目状态
 
 - [x] Proposal
