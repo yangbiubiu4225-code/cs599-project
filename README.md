@@ -111,6 +111,7 @@ cp .env.example .env
 streamlit run src/app.py
 ```
 默认使用 Mock 音乐生成，不需要额外模型M；usicGen 第一次运行会下载模型权重，配置会优先选择 `facebook/musicgen-small`。演示时建议把`MUSICGEN_DURATION` 设置为 5 到 8 秒。模型缓存默认放在 `data/model_cache/`
+
 5.可选用musicgen（注意，musicgen为外部开源项目）
 如果要使用 MusicGen 本地生成音乐
 ```bash
